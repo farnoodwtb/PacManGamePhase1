@@ -14,9 +14,9 @@ The program ends with the last star eaten.
 
 Explain what this part of code is for.
 
-```
+````
 Paste Some Code Here!
-```
+````
 
  
 
@@ -26,4 +26,4 @@ Paste Some Code Here!
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/farnoodwtb/PacManGamePhase1/blob/master/LICENSE) file for details
