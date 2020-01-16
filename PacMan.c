@@ -1,8 +1,39 @@
 #include <stdio.h>
+#include <windows.h>
+#include <string.h>
+void border (char map[100][100],int column,int row)														//making borders
+{
+	for (int i=0;i<column+2;i++)
+	putchar(178);
+	putchar('\n');
+	for(int i=0;i<row;i++)
+	{
+		putchar(178);
+		for (int j=0;j<column;j++)
+		{
+			if (map[i][j]=='1')
+				putchar(' ');
+			else 
+				if (map[i][j]=='0')
+					putchar(2);
+				else
+					if (map[i][j]=='*')
+						putchar(3);
+					else
+						putchar(178);
+		}
+		putchar(178);
+		putchar('\n');
+ 	} 
+	for (int i=0;i<column+2;i++)
+	putchar(178);
+	putchar('\n');
+}																										//End of making borders
 int main ()
 {
-	printf("  Enter The Testcase Number For Input:\n");													//opening the file
-	int testcaseNum=0,row=0,column=0,checker=0;
+	repeat:
+	printf("  Enter The LEVEL Number For Playing:\n");													//opening the file
+	int testcaseNum=0,row=0,column=0,checker=0,checkBlank=0;
 	char Adress[100]={'\0'},map[100][100]={'\0'},tmp[1000]={'\0'};
 	FILE *test;
 	scanf("%d",&testcaseNum);
@@ -14,7 +45,7 @@ int main ()
 	while(test==NULL)
 	{
 		system("cls");
-		printf("  Testcase With Number %d Is Not Available!\n\n\n  Please Enter Another Testcase Number:\n",testcaseNum);
+		printf("  LEVEL Number %d Is Not Available!\n\n\n  Please Enter Another LEVEL Number:\n",testcaseNum);
 		scanf("%d",&testcaseNum);
 		Adress[0]='\0';
 		if (testcaseNum<10)
@@ -28,16 +59,19 @@ int main ()
 	{
 		fgets(tmp,1001,test);
 		column=0;
+		checkBlank=0;
 		for (checker=0;tmp[checker]!='\n'&&tmp[checker]!='\0';checker++)
-		{
-			if (tmp[checker]=='0'||tmp[checker]=='1'||tmp[checker]=='*'||tmp[checker]=='#')
-			map[row][column++]=tmp[checker];
+		{ 
+			if (tmp[checker]=='0'||tmp[checker]=='1'||tmp[checker]=='*'||tmp[checker]=='#')	
+			{
+				map[row][column++]=tmp[checker];
+				checkBlank++;
+			}
 		}
-		row++;
+		if (checkBlank)
+			row++;
 	}																									//End of reading file
-	for(int i=0;i<row;i++){
-		for(int j=0;j<column;j++)
-			printf("%c  ",map[i][j]);
-		printf("\n\n");
-	}
+	border(map,column,row);
+	sleep(1);
+	goto repeat;
 }
