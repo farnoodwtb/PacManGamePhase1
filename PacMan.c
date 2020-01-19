@@ -391,7 +391,7 @@ int main ()
 			}
 			pDot=dots;
 			position=move(map,side,position,column,row,&dots,&lifes);
-			if(pDot!=dots)
+			if(pDot!=dots)																						//checks if in this position there was a dot and changes the dots position
 				for(int i=0;i<dotsAtFirst;i++)
 					if(dotsPosition[i] == position)
 						dotsPosition[i]=-1;
