@@ -12,24 +12,93 @@ void enqueue(Queue *q,int a)
 {
 	q->arr[q->j++] = a;
 }
-int isempty(Queue *q)
+int isEmpty(Queue *q)
 {
-	return q->i <  q->j;
+	return q->i >=  q->j;
 }
 int dequeue(Queue *q)
 {
 	return q->arr[q->i++];
 }
+int isOk (char map[100][100],int column,int row,int side,int position)											//checking if this move doesen't encounter an obstacle
+{
+	int i=1,j=0,pacman=position;
+	while(pacman>column)
+	{
+		pacman-=column;
+		i++;
+	}
+	j=pacman;
+	if (j==0)
+	{
+		j=column;
+		i--;
+	}
+	if ((side==8&&i==1)||(side==8&&map[i-2][j-1]=='#'))
+		return 0;
+	if ((side==2&&i==row)||side==2&&map[i][j-1]=='#')
+		return 0;
+	if ((side==4&&j==1)||(side==4&&map[i-1][j-2]=='#'))
+		return 0;
+	if ((side==6&&j==column)||(side==6&&map[i-1][j]=='#'))
+		return 0;
+	return 1;
+}																												//End of checking move
 int oneMove(char map[100][100],int position,int column,int row,int dotsPosition[100],int dotsAtFirst)			//computer choosing a side in which to get to the nearest dot
 {
-	int side;
-	side=rand();
-	side%=4;
-	if(side==0)side=4;
-	Sleep(500);
-	return side*2;
+	int side=0,visit[1000]={0},parents[1000] = {0},newPosition=0,currentPosition=0;
+	Queue q;
+	q.i = 0;
+	q.j = 0;
+	enqueue(&q,position);
+	visit[position]=1;
+	
+	while (!isEmpty(&q))
+	{
+		currentPosition = dequeue(&q);
+		int flag = 0;
+		for (int i = 0;i < dotsAtFirst;i++)
+			if (dotsPosition[i] == currentPosition&&dotsPosition[i]>0)
+				flag = 1;
+		if (flag)
+		{
+			while(parents[currentPosition] != position)
+				currentPosition = parents[currentPosition];
+			break;
+		}
+		for (int i = 0;i < 4;i++)
+		{
+			if (!isOk(map,column,row,(i + 1) * 2,currentPosition))
+				continue;
+			if (i==0)
+				newPosition=currentPosition+column;
+			if (i==1)
+				newPosition=currentPosition-1;
+			if (i==2)
+				newPosition=currentPosition+1;
+			if (i==3)
+				newPosition=currentPosition-column;
+			if (!visit[newPosition])
+			{
+				visit[newPosition] = 1;
+				enqueue(&q,newPosition);
+				parents[newPosition] = currentPosition;
+			}
+		}
+	}
+	if (currentPosition==position-column)
+		side=8;
+	if (currentPosition==position+column)
+		side=2;
+	if (currentPosition==position+1)
+		side=6;
+	if (currentPosition==position-1)
+		side=4;
+	
+	Sleep(200);
+	return side;
 }																												//end of computer choosing a side
- void victory()
+ void victory()																									//sound of victory
  {
 	int x;
 	Sleep(200);
@@ -43,7 +112,7 @@ int oneMove(char map[100][100],int position,int column,int row,int dotsPosition[
 	Sleep(50);
 	Beep(523,750);
 	Sleep(400);
-}
+}																												//End of sound
 int move (char map[100][100],int side,int position,int column,int row,int *dots,int *lifes)						//moving as 8 is up, 6 is right, 2 is down, 4 is left
 {
 	int i=1,j=0,pacman=position;
@@ -66,6 +135,7 @@ int move (char map[100][100],int side,int position,int column,int row,int *dots,
 			{
 				(*dots)--;
 				dotsEaten++;
+				
 			}	
 			map[i-2][j-1]='0';
 			map[i-1][j-1]='1';
@@ -124,6 +194,7 @@ int move (char map[100][100],int side,int position,int column,int row,int *dots,
 			{
 				*dots=*dots-1;
 				dotsEaten++;
+				
 			}
 			map[i-1][j-2]='0';
 			map[i-1][j-1]='1';
@@ -195,7 +266,7 @@ int main ()
 	{
 		system("cls");
 		printf("  Enter The LEVEL Number For Playing:\n\t\t\t\t\t\t\t\t\t\t\tExit : 0\n");				//opening the file
-		int testcaseNum=1,row=0,column=0,checker=0,checkBlank=0,position=0,sizeOfColumn=0,side=1,dots=0,lifes=3,ch=0,ch2=0,cheatOn=0,dotsAtFirst=0,dotsPosition[100]={0},indexForDots=0;
+		int testcaseNum=1,row=0,column=0,checker=0,checkBlank=0,position=0,sizeOfColumn=0,side=1,dots=0,lifes=3,ch=0,ch2=0,cheatOn=0,dotsAtFirst=0,dotsPosition[100]={0},indexForDots=0,pDot=0;
 		char Adress[100]={'\0'},map[100][100]={'\0'},tmp[1000]={'\0'};
 		FILE *test;
 		scanf("%d",&testcaseNum);
@@ -318,7 +389,12 @@ int main ()
 				sleep(2);
 				break;
 			}
-			position=move (map,side,position,column,row,&dots,&lifes);
+			pDot=dots;
+			position=move(map,side,position,column,row,&dots,&lifes);
+			if(pDot!=dots)
+				for(int i=0;i<dotsAtFirst;i++)
+					if(dotsPosition[i] == position)
+						dotsPosition[i]=-1;
 			Beep(1000, 70);
 			if (dotsEaten==1&&lifes<3)
 			{
@@ -370,6 +446,6 @@ int main ()
 				break;
 			}
 			system("cls");
-		}																									//End of show and play	
+		}																									//End of show and play
 	}
 }
